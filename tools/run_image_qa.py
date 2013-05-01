@@ -51,10 +51,10 @@ def CreateRegressors(funcdir, art_output, num_vols):
 
     Parameters
     -----------
-    outdir : str
-        directory to save regressor text file in
+    funcdir : str
+        subject functional directory containing QA folder
     art_output : str
-        path to directory of rapid_art.py output
+        name of rapid_art.py output containing bad volumes
     num_vols : int
         number of volumes in pre-processed functional file
     
@@ -72,21 +72,27 @@ def CreateRegressors(funcdir, art_output, num_vols):
     qa_file = os.path.join(funcdir,'data_QA',art_output)
     outliers = np.loadtxt(qa_file, dtype=int)
     outliers = np.atleast_1d(outliers)
-    if len(outliers) >= 1:
+    if len(outliers) > 1:
         exists = True
-        outlier_array = np.zeros(num_vols,dtype=float)
+        outlier_array = np.zeros((num_vols,len(outliers)),dtype=float)
         for i in range(len(outliers)):
-            outlier_array[outliers[i]]=1
+            outlier_array[outliers[i],i]=1
         outfile = os.path.join(funcdir, 'data_QA', 'outliers_for_fsl.txt')
         outlier_array.tofile(outfile)
         np.savetxt(outfile, outlier_array, fmt='%i', delimiter=u'\t')
         print 'Saved %s'%outfile
-        return exists, outlier_array
-    elif len(outliers)==0:
+    elif len(outliers) == 1:
+        exists = True
+        outlier_array = np.zeros((num_vols,len(outliers)),dtype=float)
+        outlier_array[outliers[0],0] = 1
+        outfile = os.path.join(funcdir, 'data_QA', 'outliers_for_fsl.txt')
+        outlier_array.tofile(outfile)
+        np.savetxt(outfile, outlier_array, fmt='%i', delimiter=u'\t')
+        print 'Saved %s'%outfile
+    else:
         outlier_array = np.array([])
         print 'No outliers, only mc parameters will be used'
-        return exists, outlier_array
-
+    return exists, outlier_array
 
 
 def CombineRegressors(mc_params, outlier_array, outdir, confound_outname):
@@ -148,6 +154,7 @@ if __name__ == '__main__':
         outdir = funcdir
         confound_outname = 'confound_regressors_6mm.txt'
         ######################################################
+        
         #Run artdetect and create QA directory
         rapid_art.main(infiles, param_file, param_source, thresh, outdir)
 
