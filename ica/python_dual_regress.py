@@ -135,7 +135,7 @@ def concat_regressors(a,b, outdir = None):
     return outf
         
 
-def sub_spatial_map(infile, design, mask, outdir, desnorm=True, mvt=None):
+def sub_spatial_map(infile, design, mask, outdir, desnorm=True, out_res=False, mvt=None):
     """ glm on ts data using stage1 txt file as model
     Parameters
     ----------
@@ -150,6 +150,8 @@ def sub_spatial_map(infile, design, mask, outdir, desnorm=True, mvt=None):
     desnorm : bool  (True, False, default = True)
         switch on normalisation of the design matrix
         columns to unit std. deviation
+    out_res : bool (True, False, default = False)
+        opion to output residuals image from glm
     mvt : file
         file containing movement regressors which will be concatenated
         to design (output from stage 1 glm)
@@ -159,18 +161,20 @@ def sub_spatial_map(infile, design, mask, outdir, desnorm=True, mvt=None):
         file of 4D timeseries components
     stage2_tsz : str
         file of z-transfomred 4D timesereis components
+    
 
     Notes
     -----
     fsl_glm -i <file> -d <outdir>/dr_stage1_${subid}.txt
     -o <outdir>/dr_stage2_$s --out_z=<outdir>/dr_stage2_${subid}_Z
-    --demean -m $OUTPUT/mask <desnorm>;
+    --demean -m $OUTPUT/mask <desnorm> --out_res=<outdir>/dr_stage2_${subid}_res;
     """
     
     subid = get_subid(infile)
     # define outfiles
     stage2_ts = os.path.join(outdir, 'dr_stage2_%s'%(subid))
     stage2_tsz = os.path.join(outdir,'dr_stage2_%s_Z'%(subid))
+    stage2_res = os.path.join(outdir,'dr_stage2_%s_res'%(subid))
     ext = get_fsl_outputtype()
     # add movment regressor to design if necessary
     if not mvt is None: 
@@ -185,6 +189,8 @@ def sub_spatial_map(infile, design, mask, outdir, desnorm=True, mvt=None):
     # Append des_norm flag to command if desnorm=True (defaults is True).
     if desnorm:
         cmd = ' '.join([cmd, '--des_norm'])
+    if out_res:
+        cmd = ' '.join([cmd, '--out_res=%s'%(stage2_res)])
     cout = CommandLine(cmd).run()
     if not cout.runtime.returncode == 0:
         print cmd

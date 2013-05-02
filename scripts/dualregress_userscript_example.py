@@ -54,14 +54,16 @@ if __name__ == '__main__':
     ###Set paths and specify ICA/template data
     #########################################################
     basedir = '/home/jagust/jelman/rsfmri_ica/data'
-
+    
+    # name of subject-specific ica directory (appended to subj code later)
+    sub_icadirname = '_4d_OldICA_IC0_ecat_2mm_6fwhm_125.ica' 
     ### get mask from groupica
-    mask = os.path.join(basedir, 'OldICA_IC40_ecat_7mm_125.gica', 
+    mask = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica', 
                                         'groupmelodic.ica', 
                                         'mask.nii.gz')
 
     ### location for 4D template components (eg melodic_ICA, laird_4D)
-    template = os.path.join(basedir, 'OldICA_IC40_ecat_7mm_125.gica', 
+    template = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica', 
                                         'groupmelodic.ica', 
                                         'melodic_IC.nii.gz')
 
@@ -71,7 +73,7 @@ if __name__ == '__main__':
     num_ics = int(commands.getoutput(cmd))
 
     ### output directory
-    outdir = os.path.join(basedir, 'OldICA_IC40_ecat_7mm_125.gica', 'dual_regress')
+    outdir = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica', 'dual_regress')
     if os.path.isdir(outdir)==False:
         os.mkdir(outdir)      
     else:
@@ -83,7 +85,7 @@ if __name__ == '__main__':
         os.mkdir(outdir)
         print outdir, 'exists, moving to ', newdir
 
-    ### Specify input data filelist, otherwise searches basedir for data
+    ### Specify file listing input data files, otherwise searches basedir for data
     if len(sys.argv) ==2:   #If specified, load file as list of infiles
         args = sys.argv[1]
         print 'Using data specified in ', args
@@ -118,15 +120,15 @@ if __name__ == '__main__':
         ## If you want to add movement params & spike regressors to stage2 of model
         ## mvtfile = <confound file> 
         ## Must change input of mvt parameter from None in dr_stage2 below
-        sub_icadir = ''.join([subid, '_4d_OldICA_IC0_ecat_8mm_125.ica']) 
+        sub_icadir = ''.join([subid, sub_icadirname]) 
         mvtfile = os.path.join(basedir,
                             subid,
                             'func',
-                            sub_icadir, 'mc',
-                            'prefiltered_func_data_mcf.par') #Name of confound file
-
+                            'confound_regressors_6mm.txt') #Name of confound file
+                            
+        ## If you want residuals to be output, change out_res to True below
         stage2_ts, stage2_tsz = pydr.sub_spatial_map(tmpf, txtf, mask, outdir,
-                                     desnorm=True, mvt=mvtfile)
+                                     desnorm=True, out_res=True,mvt=mvtfile)
         
         subd.update({subid:stage2_ts})
 
