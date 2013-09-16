@@ -52,28 +52,32 @@ directory will be searched for input files.
 if __name__ == '__main__':
 
     ###Set paths and specify ICA/template data
-    #########################################################
+    #######################################################################
     basedir = '/home/jagust/jelman/rsfmri_ica/data'
-    
-    # name of subject-specific ica directory (appended to subj code later)
+    gica_dir = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica')
+    # suffic of subject-specific ica directories created by melodic
+    # These will be appended to subj code later
     sub_icadirname = '_4d_OldICA_IC0_ecat_2mm_6fwhm_125.ica' 
     ### get mask from groupica
-    mask = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica', 
-                                        'groupmelodic.ica', 
-                                        'mask.nii.gz')
+    mask = os.path.join(gica_dir, 
+                        'groupmelodic.ica', 
+                        'mask.nii.gz')
 
     ### location for 4D template components (eg melodic_ICA, laird_4D)
-    template = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica', 
-                                        'groupmelodic.ica', 
-                                        'melodic_IC.nii.gz')
-
+    template = os.path.join(gica_dir, 
+                            'groupmelodic.ica', 
+                            'melodic_IC.nii.gz')
+    ## Note: Set name of confound file name in the variable mvtfile located  
+    ## in dr stage 2 below.
+    #######################################################################
+    
     #Get number of vols in template file so that only ICs of interest
     #are merged, not those corresponding to nuisance regressors.
     cmd = ' '.join(['fslnvols', template])
     num_ics = int(commands.getoutput(cmd))
 
     ### output directory
-    outdir = os.path.join(basedir, 'OldICA_IC0_ecat_2mm_6fwhm_125.gica', 'dual_regress')
+    outdir = os.path.join(gica_dir, 'dual_regress')
     if os.path.isdir(outdir)==False:
         os.mkdir(outdir)      
     else:
