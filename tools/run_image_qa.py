@@ -1,5 +1,4 @@
 import sys, os
-sys.path.append("/home/jagust/cindeem/CODE/PetProcessing/misc")
 import rapid_art
 import numpy as np
 
