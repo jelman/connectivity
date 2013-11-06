@@ -64,18 +64,25 @@ def calculate_diff_map(dat_array):
     diff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
     return diff_array
 
-#Path to 4D files in which networks are concatenated over time
-datadir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/dual_regress'
-#Directory to output difference maps
-outdir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/difference_maps'
-subjstr = 'subject[0-9]{4}'
-dataglobstr = 'dr_stage2_subject*_Z.nii.gz'
-datafiles = glob(os.path.join(datadir, dataglobstr))
-#Indicies of networks to include. Start count at 0. 
-net_idx = [0,1,2,3,4,6,7,8,9,12,14,15,24,29] 
 
-for subj_file in datafiles:
-    dat, aff = gu.load_nii(subj_file)
-    nets_dat = dat[:,:,:,net_idx]
-    diff_array = calculate_diff_map(nets_dat)
-    
+    if __name__ == '__main__':
+        
+    #Path to 4D files in which networks are concatenated over time
+    datadir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/dual_regress'
+    #Directory to output difference maps
+    outdir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/difference_maps'
+    subjstr = 'subject[0-9]{4}'
+    dataglobstr = 'dr_stage2_subject*_Z.nii.gz'
+    datafiles = glob(os.path.join(datadir, dataglobstr))
+    #Indicies of networks to include. Start count at 0. 
+    net_idx = [0,1,2,3,4,6,7,8,9,12,14,15,24,29] 
+
+    for subj_file in datafiles:
+        subid = gu.get_subid(subj_file, subjstr)
+        print 'Starting on subject'%(subid)
+        dat, aff = gu.load_nii(subj_file)
+        nets_dat = dat[:,:,:,net_idx]
+        diff_array = calculate_diff_map(nets_dat)
+        diff_img = nib.Nifti1Image(diff_array, aff)
+        outfile = os.path.join(outdir, ''.join(['net_diff_',subid,'.nii.gz']))
+        nib.save(diff_img, outfile)
