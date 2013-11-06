@@ -71,7 +71,7 @@ if __name__ == '__main__':
     datadir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/dual_regress'
     #Directory to output difference maps
     outdir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/difference_maps'
-    subjstr = 'subject[0-9]{4}'
+    subjstr = 'subject[0-9]{5}'
     dataglobstr = 'dr_stage2_subject*_Z.nii.gz'
     datafiles = glob(os.path.join(datadir, dataglobstr))
     #Indicies of networks to include. Start count at 0. 
