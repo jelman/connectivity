@@ -44,7 +44,7 @@ def get_primary_net(dat_array2d):
     other_nets.mask[np.arange(len(dat_array2d)),prim_net_idx] = True
     return prim_net, other_nets
 
-def calculate_diff_map():
+def calculate_diff_map(dat_array):
     """
     Takes a numpy array and finds the mean difference between the max 
     value and all others across time/scans. 
@@ -62,7 +62,7 @@ def calculate_diff_map():
     nets_diff = prim_net - other_nets
     nets_diff_mean = nets_diff.mean(axis=1)
     diff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
-
+    return diff_array
 
 #Path to 4D files in which networks are concatenated over time
 datadir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/dual_regress'
@@ -77,3 +77,5 @@ net_idx = [0,1,2,3,4,6,7,8,9,12,14,15,24,29]
 for subj_file in datafiles:
     dat, aff = gu.load_nii(subj_file)
     nets_dat = dat[:,:,:,net_idx]
+    diff_array = calculate_diff_map(nets_dat)
+    
