@@ -1,6 +1,6 @@
 import os, sys
 import numpy as np
-import nibabel as nibabel
+import nibabel as nib
 from glob import glob
 import general_utilities as gu
 
@@ -65,7 +65,7 @@ def calculate_diff_map(dat_array):
     return diff_array
 
 
-    if __name__ == '__main__':
+if __name__ == '__main__':
         
     #Path to 4D files in which networks are concatenated over time
     datadir = '/home/jagust/rsfmri_ica/data/Allsubs_YoungICA_2mm_IC30.gica/dual_regress'
@@ -79,7 +79,7 @@ def calculate_diff_map(dat_array):
 
     for subj_file in datafiles:
         subid = gu.get_subid(subj_file, subjstr)
-        print 'Starting on subject'%(subid)
+        print 'Starting on subject %s'%(subid)
         dat, aff = gu.load_nii(subj_file)
         nets_dat = dat[:,:,:,net_idx]
         diff_array = calculate_diff_map(nets_dat)
