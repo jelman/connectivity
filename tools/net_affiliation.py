@@ -98,8 +98,11 @@ if __name__ == '__main__':
         nets_dat = dat[:,:,:,net_idx]
         meandiff_array, sumdiff_array, splitdiff_array = calculate_diff_map(nets_dat)
         meandiff_img = nib.Nifti1Image(meandiff_array, aff)
+        sumdiff_img = nib.Nifti1Image(sumdiff_array, aff)
         splitdiff_img = nib.Nifti1Image(splitdiff_array, aff)
         mean_outfile = os.path.join(outdir, ''.join(['net_mean_diff_',subid,'.nii.gz']))
+        sum_outfile = os.path.join(outdir, ''.join(['net_sum_diff_',subid,'.nii.gz']))
         split_outfile = os.path.join(outdir, ''.join(['net_split_diff_',subid,'.nii.gz']))
-        nib.save(meandiff_img, outfile)
-        nib.save(splitdiff_img, outfile)
+        nib.save(meandiff_img, mean_outfile)
+        nib.save(sumdiff_img, sum_outfile)
+        nib.save(splitdiff_img, split_outfile)
