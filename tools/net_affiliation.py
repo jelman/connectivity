@@ -53,7 +53,12 @@ def calculate_diff_map(dat_array):
     dat_array : numpy array (at least 2d)
 
     Returns:
-    diff_array : numpy array
+    meandiff_array : numpy array
+                The mean difference between the primary network and
+                each of the other networks
+    sumdiff_array : numpy array
+                The difference between the primary network and the sum
+                of all other networks
     """
     dat_array = np.atleast_2d(dat_array)
     n_voxels, n_nets = get_dims(dat_array)
@@ -61,11 +66,12 @@ def calculate_diff_map(dat_array):
     prim_net, other_nets = get_primary_net(dat_array2d) 
     nets_diff = prim_net - other_nets
     nets_diff_mean = nets_diff.mean(axis=1)
-    diff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
+    meandiff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
     sum_other_nets = other_nets.sum(axis=1)
     sum_other_nets = np.reshape(sum_other_nets, (sum_other_nets.shape[0], 1))
     nets_sum_diff = prim_net - sum_other_nets
-    return diff_array
+    sumdiff_array = np.reshape(nets_sum_diff, (dat_array.shape[:-1]))
+    return meandiff_array, sumdiff_array
 
 
 if __name__ == '__main__':
@@ -85,7 +91,10 @@ if __name__ == '__main__':
         print 'Starting on subject %s'%(subid)
         dat, aff = gu.load_nii(subj_file)
         nets_dat = dat[:,:,:,net_idx]
-        diff_array = calculate_diff_map(nets_dat)
-        diff_img = nib.Nifti1Image(diff_array, aff)
-        outfile = os.path.join(outdir, ''.join(['net_diff_',subid,'.nii.gz']))
-        nib.save(diff_img, outfile)
+        meandiff_array, sumdiff_array = calculate_diff_map(nets_dat)
+        meandiff_img = nib.Nifti1Image(meandiff_array, aff)
+        sumdiff_img = nib.Nifti1Image(sumdiff_array, aff)
+        mean_outfile = os.path.join(outdir, ''.join(['net_mean_diff_',subid,'.nii.gz']))
+        sum_outfile = os.path.join(outdir, ''.join(['net_sum_diff_',subid,'.nii.gz']))
+        nib.save(meandiff_img, mean_outfile)
+        nib.save(sumdiff_img, sum_outfile)
