@@ -57,6 +57,9 @@ def calculate_diff_map(dat_array):
                 The mean difference between the primary network and
                 each of the other networks
     sumdiff_array : numpy array
+                The sum of sifferences beterrn prmaru network and 
+                each of the other networks
+    splitdiff_array : numpy array
                 The difference between the primary network and the sum
                 of all other networks
     """
@@ -67,11 +70,13 @@ def calculate_diff_map(dat_array):
     nets_diff = prim_net - other_nets
     nets_diff_mean = nets_diff.mean(axis=1)
     meandiff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
-    sum_other_nets = other_nets.sum(axis=1)
-    sum_other_nets = np.reshape(sum_other_nets, (sum_other_nets.shape[0], 1))
-    nets_sum_diff = prim_net - sum_other_nets
-    sumdiff_array = np.reshape(nets_sum_diff, (dat_array.shape[:-1]))
-    return meandiff_array, sumdiff_array
+    nets_diff_sum = nets_diff.sum(axis=1)
+    sumdiff_array = np.reshape(nets_diff_sum, (dat_array.shape[:-1]))
+    split_other_nets = other_nets.sum(axis=1)
+    split_other_nets = np.reshape(split_other_nets, (split_other_nets.shape[0], 1))
+    nets_diff_split= prim_net - split_other_nets
+    splitdiff_array = np.reshape(nets_diff_split, (dat_array.shape[:-1]))
+    return meandiff_array, sumdiff_array, splitdiff_array
 
 
 if __name__ == '__main__':
@@ -91,10 +96,10 @@ if __name__ == '__main__':
         print 'Starting on subject %s'%(subid)
         dat, aff = gu.load_nii(subj_file)
         nets_dat = dat[:,:,:,net_idx]
-        meandiff_array, sumdiff_array = calculate_diff_map(nets_dat)
+        meandiff_array, sumdiff_array, splitdiff_array = calculate_diff_map(nets_dat)
         meandiff_img = nib.Nifti1Image(meandiff_array, aff)
-        sumdiff_img = nib.Nifti1Image(sumdiff_array, aff)
+        splitdiff_img = nib.Nifti1Image(splitdiff_array, aff)
         mean_outfile = os.path.join(outdir, ''.join(['net_mean_diff_',subid,'.nii.gz']))
-        sum_outfile = os.path.join(outdir, ''.join(['net_sum_diff_',subid,'.nii.gz']))
-        nib.save(meandiff_img, mean_outfile)
-        nib.save(sumdiff_img, sum_outfile)
+        split_outfile = os.path.join(outdir, ''.join(['net_split_diff_',subid,'.nii.gz']))
+        nib.save(meandiff_img, outfile)
+        nib.save(splitdiff_img, outfile)
