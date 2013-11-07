@@ -62,6 +62,9 @@ def calculate_diff_map(dat_array):
     nets_diff = prim_net - other_nets
     nets_diff_mean = nets_diff.mean(axis=1)
     diff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
+    sum_other_nets = other_nets.sum(axis=1)
+    sum_other_nets = np.reshape(sum_other_nets, (sum_other_nets.shape[0], 1))
+    nets_sum_diff = prim_net - sum_other_nets
     return diff_array
 
 
