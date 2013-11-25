@@ -67,12 +67,23 @@ def calculate_diff_map(dat_array):
     n_voxels, n_nets = get_dims(dat_array)
     dat_array2d = np.reshape(dat_array, (n_voxels, n_nets))
     prim_net, other_nets = get_primary_net(dat_array2d) 
+    other_nets_mean = other_nets.mean(axis=1)
     other_nets_mean = np.reshape(other_nets_mean, (other_nets_mean.shape[0],1))
     nets_diff = prim_net - other_nets_mean
     nets_diff_array = np.reshape(nets_diff, (dat_array.shape[:-1]))
     return nets_diff_array
 
-
+def main(datafiles):
+    for subj_file in datafiles:
+        subid = gu.get_subid(subj_file, subjstr)
+        print 'Starting on subject %s'%(subid)
+        dat, aff = gu.load_nii(subj_file)
+        nets_dat = dat[:,:,:,net_idx]
+        nets_diff_array = calculate_diff_map(nets_dat)
+        nets_diff_outfile = os.path.join(outdir, ''.join(['nets_diff_',subid,'.nii.gz']))
+        gu.save_nii(nets_diff_outfile, nets_diff_array, aff)
+        
+        
 if __name__ == '__main__':
         
     #Path to 4D files in which networks are concatenated over time
@@ -85,18 +96,5 @@ if __name__ == '__main__':
     #Indicies of networks to include. Start count at 0. 
     net_idx = [0,1,2,3,4,6,7,8,9,12,14,15,24,29] 
 
-    for subj_file in datafiles:
-        subid = gu.get_subid(subj_file, subjstr)
-        print 'Starting on subject %s'%(subid)
-        dat, aff = gu.load_nii(subj_file)
-        nets_dat = dat[:,:,:,net_idx]
-        meandiff_array, sumdiff_array, splitdiff_array = calculate_diff_map(nets_dat)
-        meandiff_img = nib.Nifti1Image(meandiff_array, aff)
-        sumdiff_img = nib.Nifti1Image(sumdiff_array, aff)
-        splitdiff_img = nib.Nifti1Image(splitdiff_array, aff)
-        mean_outfile = os.path.join(outdir, ''.join(['net_mean_diff_',subid,'.nii.gz']))
-        sum_outfile = os.path.join(outdir, ''.join(['net_sum_diff_',subid,'.nii.gz']))
-        split_outfile = os.path.join(outdir, ''.join(['net_split_diff_',subid,'.nii.gz']))
-        nib.save(meandiff_img, mean_outfile)
-        nib.save(sumdiff_img, sum_outfile)
-        nib.save(splitdiff_img, split_outfile)
+    main(datafiles)
+
