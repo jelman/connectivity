@@ -67,16 +67,10 @@ def calculate_diff_map(dat_array):
     n_voxels, n_nets = get_dims(dat_array)
     dat_array2d = np.reshape(dat_array, (n_voxels, n_nets))
     prim_net, other_nets = get_primary_net(dat_array2d) 
-    nets_diff = prim_net - other_nets
-    nets_diff_mean = nets_diff.mean(axis=1)
-    meandiff_array = np.reshape(nets_diff_mean, (dat_array.shape[:-1]))
-    nets_diff_sum = nets_diff.sum(axis=1)
-    sumdiff_array = np.reshape(nets_diff_sum, (dat_array.shape[:-1]))
-    split_other_nets = other_nets.sum(axis=1)
-    split_other_nets = np.reshape(split_other_nets, (split_other_nets.shape[0], 1))
-    nets_diff_split= prim_net - split_other_nets
-    splitdiff_array = np.reshape(nets_diff_split, (dat_array.shape[:-1]))
-    return meandiff_array, sumdiff_array, splitdiff_array
+    other_nets_mean = np.reshape(other_nets_mean, (other_nets_mean.shape[0],1))
+    nets_diff = prim_net - other_nets_mean
+    nets_diff_array = np.reshape(nets_diff, (dat_array.shape[:-1]))
+    return nets_diff_array
 
 
 if __name__ == '__main__':
